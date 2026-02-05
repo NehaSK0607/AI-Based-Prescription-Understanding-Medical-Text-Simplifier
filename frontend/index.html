@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Compliance Document</title>
+</head>
+<body>
+    <h2>Upload Compliance Document</h2>
+
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">Upload</button>
+
+    <p id="status"></p>
+    <pre id="result"></pre>
+
+
+    <script>
+async function uploadFile() {
+    const fileInput = document.getElementById("fileInput");
+    const status = document.getElementById("status");
+
+    if (!fileInput.files.length) {
+        status.innerText = "Please choose a file first!";
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+
+    status.innerText = "Uploading...";
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/upload", { //this line aslo makes this into restful api alsong withthe main.py backend
+            method: "POST",
+            body: formData
+        });
+
+       const data = await response.json();
+       console.log("Backend response:", data);
+
+       status.innerText = "Upload successful!";
+
+       const resultDiv = document.getElementById("result");
+resultDiv.innerText = 
+    "----- RAW OCR TEXT -----\n\n" + data.extracted_text + 
+    "\n\n----- CLEANED TEXT -----\n\n" + data.cleaned_text;
+
+
+    } catch (err) {
+        console.error(err);
+        status.innerText = "Something went wrong in frontend JS, not backend.";
+    }
+}
+</script>
+
+
+</body>
+</html>
